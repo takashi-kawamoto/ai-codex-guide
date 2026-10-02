@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Codexの設定（AGENTS.md・config.toml・Plugins・Skills・MCP・Subagents・Hooks・承認とサンドボックス・スラッシュコマンド）を1つのHTMLにまとめたガイド。">
+  <title>Codex設定ガイド</title>
+  <style>
+
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.65}a:focus-visible{outline:3px solid #e88343;outline-offset:3px}main{max-width:1120px;margin:auto;padding:38px 22px 90px}.meta{font-size:.84rem;margin:0 0 23px}.grid{display:grid;gap:16px}article h2{margin:0;font-size:1.3rem}article h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin:20px 0 6px}article ul{list-style:none;padding:0;margin:0}article li+li{margin-top:5px}article a{text-underline-offset:3px;overflow-wrap:anywhere}.maker{margin:1px 0 14px;font-size:.83rem}.note{margin:20px 0 0;padding-top:14px;font-size:.85rem}.guide{margin-top:26px;padding:20px 24px}.guide h2{font-size:1rem;margin:0 0 5px}.guide p{margin:0;font-size:.9rem}footer{font-size:.82rem;margin-top:26px}@media(max-width:740px){main{padding:30px 16px 70px}}
+
+      :root{color:#202933;background:#fff}a{color:#125a78}a:hover{color:#b55029}
+      header.hero{padding:58px max(22px,calc((100vw - 1120px)/2)) 48px;background:#f5f6f4;border-bottom:1px solid #dfe4e2}.eyebrow{font:700 .73rem ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#277477}h1{font-size:clamp(2.1rem,4.6vw,3.3rem);letter-spacing:-.05em;line-height:1.28;max-width:19em;margin:16px 0 10px}.hero p{max-width:48em;color:#52616b;margin:0}
+      main{max-width:1180px}.meta{color:#697985}.grid{grid-template-columns:1fr;gap:0;border-top:2px solid #2a5c68}article{display:grid;grid-template-columns:210px repeat(2,minmax(0,1fr));gap:0 26px;padding:22px 6px;border-bottom:1px solid #dce3e4;background:#fff}article h2{grid-column:1;grid-row:1;font-size:1.13rem}article .maker{grid-column:1;grid-row:2;color:#75828a;margin:0}article h3{margin:0 0 7px;color:#526874}article h3:nth-of-type(1),article h3:nth-of-type(1)+ul{grid-column:2}article h3:nth-of-type(2),article h3:nth-of-type(2)+ul{grid-column:3}article h3:nth-of-type(3),article h3:nth-of-type(3)+ul{grid-column:4}article h3:nth-of-type(1),article h3:nth-of-type(2),article h3:nth-of-type(3){grid-row:1}article h3:nth-of-type(1)+ul,article h3:nth-of-type(2)+ul,article h3:nth-of-type(3)+ul{grid-row:2}article .note{grid-column:2 / 4;grid-row:3;border:0;padding:0;margin:12px 0 0;color:#66747e}article li a{font-size:.89rem}.guide{border-top:2px solid #2a5c68;background:#f2f5f5}.guide p,footer{color:#60717b}
+      article h2{display:flex;align-items:center}
+      code{font-family:ui-monospace,Consolas,monospace;font-size:.84em;background:#eef2f2;border-radius:4px;padding:1px 5px;overflow-wrap:anywhere}article h2 code{font-size:1em;background:none;padding:0;color:#1d4954}article li{font-size:.89rem}
+      article pre{margin:0;max-width:100%;overflow-x:auto;padding:10px 12px;background:#f2f5f5;border-left:3px solid #2a5c68;font:.8rem/1.65 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:#202933}
+      .section-title{font-size:1.05rem;color:#2a5c68;margin:40px 0 10px}.section-title:first-of-type{margin-top:0}
+      @media(max-width:760px){header.hero{padding:52px 18px 44px}article{grid-template-columns:1fr 1fr;gap:4px 18px;padding:22px 0}article h2{grid-column:1/3;grid-row:auto}article .maker{grid-column:1/3;grid-row:auto;margin-bottom:8px}article h3:nth-of-type(1),article h3:nth-of-type(1)+ul{grid-column:1}article h3:nth-of-type(2),article h3:nth-of-type(2)+ul{grid-column:2}article h3:nth-of-type(3),article h3:nth-of-type(3)+ul{grid-column:1/3}article h3:nth-of-type(1),article h3:nth-of-type(2),article h3:nth-of-type(3),article h3:nth-of-type(1)+ul,article h3:nth-of-type(2)+ul,article h3:nth-of-type(3)+ul{grid-row:auto}article .note{grid-column:1/3;grid-row:auto}}@media(max-width:470px){article{grid-template-columns:1fr}article h2,article .maker,article h3:nth-of-type(n),article h3:nth-of-type(n)+ul,article .note{grid-column:1}}
+
+/* ===== 配色テーマ：ネイビー＆ゴールド ===== */
+:root{--navy:#1f3a5f;--gold:#c08a1e;--gold-text:#8a6416;--text:#1c2433;--muted:#5a6577;--line:#e1e5ec;--soft:#f4f6fa;--code-bg:#f6f8fb;--chip:#eef2f8;--link:#1f4f8a;--link-hover:#a8741a}
+:root{color:var(--text);background:#fff}body{color:var(--text);background:#fff}
+a{color:var(--link)}a:hover{color:var(--link-hover)}a:focus-visible{outline-color:var(--gold)}
+header.hero{background:var(--navy);border-bottom:1px solid var(--navy)}header.hero h1{color:#fff}.hero p{color:#c9d3e3}.eyebrow{color:#e3b65a}
+.meta{color:var(--muted)}
+.section-title{color:var(--navy)}
+.grid{border-top-color:var(--navy)}
+article{border-bottom-color:var(--line)}
+article h3{color:var(--gold-text)}
+article .maker,article .note{color:var(--muted)}
+article h2 code{color:var(--navy)}
+code{background:var(--chip)}
+article pre{background:var(--code-bg);border-left-color:var(--gold)}
+.guide{background:var(--soft);border-top-color:var(--navy)}.guide p,footer{color:var(--muted)}
+
+article h2 a{text-decoration:none;color:inherit}article h2 a:hover{color:var(--link-hover);text-decoration:underline}
+
+.panel{scroll-margin-top:70px}
+.panel-head{padding:6px 0 22px;margin-bottom:26px;border-bottom:1px solid var(--line)}
+.panel-head .eyebrow{color:var(--gold-text);margin:0}
+.panel-title{font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.03em;line-height:1.3;margin:8px 0 6px;color:var(--navy)}
+.panel-head .lead{margin:0;color:var(--muted);max-width:48em}
+.panel [id]{scroll-margin-top:80px}
+
+.layout{max-width:1240px;margin:auto;padding:30px 22px 90px;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:36px;align-items:start}
+.layout>.sidebar{grid-column:2;grid-row:1}.layout>main{grid-column:1;grid-row:1}
+.sidebar{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:14px 10px}
+.sidebar p{margin:14px 8px 4px;font-size:.74rem;letter-spacing:.06em;font-weight:700;color:var(--gold-text)}.sidebar p:first-child{margin-top:0}
+.sidebar ul{list-style:none;margin:0;padding:0}
+.sidebar a{display:block;padding:6px 10px;border-radius:6px;color:var(--text);text-decoration:none;font-size:.9rem;border-left:3px solid transparent}
+.sidebar a:hover{background:#e7ecf4}
+.sidebar a[aria-current="page"]{background:var(--navy);color:#fff;border-left-color:#e3b65a;font-weight:700}
+main{min-width:0;padding-top:0}
+@media(max-width:860px){.layout{grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 16px 70px}.layout>.sidebar,.layout>main{grid-column:1;grid-row:auto}.sidebar{position:static;max-height:none;display:flex;flex-wrap:wrap;gap:4px;padding:10px}.sidebar p{display:none}.sidebar ul{display:contents}.sidebar a{padding:5px 10px;font-size:.84rem;border:1px solid var(--line);background:#fff}}
+.panel .grid{grid-template-columns:minmax(0,1fr)}
+.panel article{display:block;padding:26px 4px;border-bottom:1px solid var(--line);background:#fff}
+.panel article h2{display:block;font-size:1.2rem;margin:0;color:var(--text)}
+.panel article .maker{margin:4px 0 4px;font-size:.83rem;color:var(--muted)}
+.panel article h3{margin:16px 0 6px;font-size:.78rem;letter-spacing:.08em;color:var(--gold-text)}
+.panel article ul{list-style:disc;padding-left:1.3em;margin:0}
+.panel article li{font-size:.93rem}.panel article li+li{margin-top:4px}
+.panel article li::marker{color:var(--gold)}
+.panel article ul.code-list,.panel article ul:has(pre){list-style:none;padding-left:0}
+.panel article pre{white-space:pre;overflow-x:auto;max-width:100%;margin:0;padding:16px 18px;font:.84rem/1.7 ui-monospace,Consolas,monospace;background:var(--code-bg);color:var(--text);border:1px solid #d6dde8;border-left:1px solid #d6dde8;border-radius:8px}
+.codebox{position:relative}
+.codebox .copy{position:absolute;top:8px;right:8px;font-size:.75rem;color:var(--navy);background:#fff;border:1px solid #d6dde8;border-radius:5px;padding:2px 9px;cursor:pointer}
+.codebox .copy:hover{background:var(--chip)}.codebox .copy:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.panel article .note{display:block;margin:14px 0 0;padding:10px 14px;font-size:.88rem;color:#5b4a26;background:#fdf6e7;border:0;border-left:3px solid var(--gold);border-radius:0 6px 6px 0}
+@media(max-width:760px){.panel article{padding:22px 0}}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">CODEX / ALL-IN-ONE GUIDE</p>
+    <h1>Codex設定ガイド</h1>
+    <p>確認日：2026年10月3日</p>
+  </header>
+  <div class="layout" id="content">
+    <nav class="sidebar" aria-label="ページの切り替え">
+      <p>はじめに</p><ul><li><a href="#p-index" data-target="p-index">目次</a></li></ul>
+      <p>指示・ルール</p><ul><li><a href="#p-agents-md" data-target="p-agents-md">AGENTS.md</a></li><li><a href="#p-config" data-target="p-config">config.toml</a></li></ul>
+      <p>機能拡張</p><ul><li><a href="#p-plugins" data-target="p-plugins">Plugins</a></li><li><a href="#p-skills" data-target="p-skills">Skills</a></li><li><a href="#p-mcp" data-target="p-mcp">MCP</a></li><li><a href="#p-subagents" data-target="p-subagents">Subagents</a></li></ul>
+      <p>自動化・制御</p><ul><li><a href="#p-hooks" data-target="p-hooks">Hooks</a></li><li><a href="#p-approval" data-target="p-approval">承認・サンドボックス</a></li></ul>
+      <p>操作</p><ul><li><a href="#p-slash-commands" data-target="p-slash-commands">スラッシュコマンド</a></li></ul>
+    </nav>
+    <main>
+    <section class="panel" id="p-index" aria-labelledby="t-index">
+      <div class="panel-head"><p class="eyebrow">CODEX / INDEX</p><h2 class="panel-title" id="t-index">Codex設定ガイド 目次</h2></div>
+
+    <h2 class="section-title" id="index--by-feature">機能から探す</h2>
+
+    <h2 class="section-title">指示・ルール：Codexに守らせる前提と動作を決める</h2>
+    <div class="grid">
+      <article>
+        <h2><a href="#p-agents-md">CodexのAGENTS.md一覧</a></h2><p class="maker">AGENTS.md</p>
+        <h3>わかること</h3><ul><li>AGENTS.mdの書き方の型</li><li>グローバル・プロジェクト・モノレポでの使い分け</li></ul>
+        <h3>主な掲載内容</h3><ul><li>基本形・グローバルAGENTS.md</li><li>検証コマンド・禁止事項の書き方</li><li>AI向けに短く書くコツ</li></ul>
+        <p class="note">最初に読むページです。記載例をそのまま写して使えます。</p>
+      </article>
+      <article>
+        <h2><a href="#p-config">Codexのconfig.toml設定一覧</a></h2><p class="maker">config.toml</p>
+        <h3>わかること</h3><ul><li>Codex自体の動作の設定方法</li><li>利用枠を節約する方法</li></ul>
+        <h3>主な掲載内容</h3><ul><li>モデル・推論の深さ・プロファイル</li><li>ステータスライン・通知</li><li>機能フラグ・マルチエージェント</li></ul>
+        <p class="note">AGENTS.mdは「振る舞い」、config.tomlは「動作環境」を決めます。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">機能拡張：Codexにできることを増やす</h2>
+    <div class="grid">
+      <article>
+        <h2><a href="#p-plugins">Codexのプラグイン一覧</a></h2><p class="maker">Plugins</p>
+        <h3>わかること</h3><ul><li>/pluginsで導入できるプラグイン</li><li>導入時のセキュリティ上の注意</li></ul>
+        <h3>主な掲載内容</h3><ul><li>Superpowers・Grill Me・Fix CI・Yeet</li><li>Slack・Linear・Figma・Gmail</li><li>Codex Security・Claude Code向けプラグイン</li></ul>
+        <p class="note">Skills・Hooks・外部連携をまとめて追加したいときに見るページです。</p>
+      </article>
+      <article>
+        <h2><a href="#p-skills">CodexのSkills一覧</a></h2><p class="maker">Skills</p>
+        <h3>わかること</h3><ul><li>SKILL.mdの作り方</li><li>置き場所とチームでの共有方法</li></ul>
+        <h3>主な掲載内容</h3><ul><li>最小構造・説明文の書き方</li><li>補助スクリプト・$skill-creator</li><li>個人用とチーム用の使い分け</li></ul>
+        <p class="note">繰り返す作業手順を再利用したいときに見るページです。</p>
+      </article>
+      <article>
+        <h2><a href="#p-mcp">CodexのMCP設定一覧</a></h2><p class="maker">MCP</p>
+        <h3>わかること</h3><ul><li>外部ツールの接続方法</li><li>安全に使うための設定</li></ul>
+        <h3>主な掲載内容</h3><ul><li>codex mcp add / list / get</li><li>config.tomlでの設定・認証</li><li>STDIOとHTTP・許可リスト</li></ul>
+        <p class="note">外部サービスやツールと連携したいときに見るページです。</p>
+      </article>
+      <article>
+        <h2><a href="#p-subagents">CodexのSubagents（Custom Agent）一覧</a></h2><p class="maker">Subagents</p>
+        <h3>わかること</h3><ul><li>Custom Agentの作り方</li><li>Main AgentとSubagentの役割分担</li></ul>
+        <h3>主な掲載内容</h3><ul><li>Architect・Review・Builder・Tester</li><li>プロジェクト構成</li><li>並列実行の注意点</li></ul>
+        <p class="note">作業を分担させて、コンテキストを整理したいときに見るページです。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">自動化・制御：動きと範囲を決める</h2>
+    <div class="grid">
+      <article>
+        <h2><a href="#p-approval">Codexの承認・サンドボックス設定一覧</a></h2><p class="maker">承認・サンドボックス</p>
+        <h3>わかること</h3><ul><li>承認モードとサンドボックスの違い</li><li>用途別の組み合わせ</li></ul>
+        <h3>主な掲載内容</h3><ul><li>read-only・workspace-write・danger-full-access</li><li>on-request・never・writable roots</li><li>基本セット・自律実行の設定</li></ul>
+        <p class="note">Codexを安全に使うための土台となる設定です。</p>
+      </article>
+      <article>
+        <h2><a href="#p-hooks">CodexのHooks一覧</a></h2><p class="maker">Hooks</p>
+        <h3>わかること</h3><ul><li>Hooksの有効化と確認方法</li></ul>
+        <h3>主な掲載内容</h3><ul><li>[features] hooks = true</li><li>イベントとプラグイン経由のHooks</li></ul>
+        <p class="note">記事で紹介されている範囲に絞っています。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">操作：日々の作業で使うコマンド</h2>
+    <div class="grid">
+      <article>
+        <h2><a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a></h2><p class="maker">Slash Commands</p>
+        <h3>わかること</h3><ul><li>よく使うコマンドの用途</li><li>計画・確認・レビューの流れ</li></ul>
+        <h3>主な掲載内容</h3><ul><li>/new・/compact・/resume・/side</li><li>/plan・/goal・/diff・/review</li><li>/model・/permissions・/init</li></ul>
+        <p class="note">セッション管理や変更確認など、毎日の操作で使うコマンドをまとめています。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title" id="index--by-use">用途から探す</h2>
+    <div class="grid">
+      <article>
+        <h2>はじめて導入する</h2><p class="maker">初期設定</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-agents-md">CodexのAGENTS.md一覧</a></li><li><a href="#p-approval">Codexの承認・サンドボックス設定一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-config">Codexのconfig.toml設定一覧</a></li><li><a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a></li></ul>
+        <p class="note">/initでAGENTS.mdを作り、workspace-write＋on-requestから使い始めます。</p>
+      </article>
+      <article>
+        <h2>安全に使う</h2><p class="maker">セキュリティ</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-approval">Codexの承認・サンドボックス設定一覧</a></li><li><a href="#p-agents-md">CodexのAGENTS.md一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-mcp">CodexのMCP設定一覧</a></li><li><a href="#p-plugins">Codexのプラグイン一覧</a></li></ul>
+        <p class="note">サンドボックスで範囲を決め、AGENTS.mdに禁止事項を書き、外部の拡張は中身を確認してから導入します。</p>
+      </article>
+      <article>
+        <h2>開発の品質を上げる</h2><p class="maker">品質・レビュー</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a></li><li><a href="#p-skills">CodexのSkills一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-plugins">Codexのプラグイン一覧</a></li><li><a href="#p-subagents">CodexのSubagents（Custom Agent）一覧</a></li></ul>
+        <p class="note">/reviewをコミット前に通し、レビュー観点はSkillにして再利用します。</p>
+      </article>
+      <article>
+        <h2>外部サービスと連携する</h2><p class="maker">連携</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-mcp">CodexのMCP設定一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-plugins">Codexのプラグイン一覧</a></li><li><a href="#p-approval">Codexの承認・サンドボックス設定一覧</a></li></ul>
+        <p class="note">書き込みができるツールは許可リストで絞って使います。</p>
+      </article>
+      <article>
+        <h2>作業を分担・自動化する</h2><p class="maker">自動化</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-subagents">CodexのSubagents（Custom Agent）一覧</a></li><li><a href="#p-skills">CodexのSkills一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-approval">Codexの承認・サンドボックス設定一覧</a></li><li><a href="#p-hooks">CodexのHooks一覧</a></li></ul>
+        <p class="note">人が都度確認しない運用ほど、承認とサンドボックスの設定を先に決めておきます。</p>
+      </article>
+      <article>
+        <h2>利用枠を節約する</h2><p class="maker">効率化</p>
+        <h3>まず見るページ</h3><ul><li><a href="#p-config">Codexのconfig.toml設定一覧</a></li><li><a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a></li></ul>
+        <h3>あわせて見るページ</h3><ul><li><a href="#p-agents-md">CodexのAGENTS.md一覧</a></li><li><a href="#p-subagents">CodexのSubagents（Custom Agent）一覧</a></li></ul>
+        <p class="note">モデルと推論の深さを調整し、/compact・/sideでコンテキストを節約します。</p>
+      </article>
+    </div>
+
+    <aside class="guide" id="index--order" aria-labelledby="index--reading-note"><h2 id="index--reading-note">読み順</h2><p>1. <a href="#p-agents-md">CodexのAGENTS.md一覧</a> → 2. <a href="#p-approval">Codexの承認・サンドボックス設定一覧</a> → 3. <a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a> → 4. <a href="#p-config">Codexのconfig.toml設定一覧</a> → 5. <a href="#p-skills">CodexのSkills一覧</a> → 6. <a href="#p-mcp">CodexのMCP設定一覧</a> → 7. <a href="#p-plugins">Codexのプラグイン一覧</a> → 8. <a href="#p-subagents">CodexのSubagents（Custom Agent）一覧</a> → 9. <a href="#p-hooks">CodexのHooks一覧</a></p><p style="margin-top:8px">まず「指示」と「権限」を整えてから、「拡張」と「自動化」を少しずつ足していくと、安全に使いこなせるようになります。</p></aside>
+
+    </section>
+    <section class="panel" id="p-agents-md" aria-labelledby="t-agents-md">
+      <div class="panel-head"><p class="eyebrow">CODEX / AGENTS.MD</p><h2 class="panel-title" id="t-agents-md">CodexのAGENTS.md一覧</h2></div>
+
+    <h2 class="section-title">まず用意したいAGENTS.md</h2>
+    <div class="grid">
+      <article>
+        <h2>プロジェクト用の基本形</h2><p class="maker"><code>&lt;project&gt;/AGENTS.md</code></p>
+        <h3>記載例</h3><ul><li><pre># Project
+Python + FastAPI application.
+
+# Validation
+Test:
+pytest tests/
+Lint:
+ruff check .
+
+# Do Not
+- Do not force push.
+- Do not modify .env files.</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>リポジトリのルート直下に置く</li><li>Codexは作業開始時にまず読み込み、以降の判断の前提にする</li><li>最初は数行から始め、運用しながら育てる</li></ul>
+        <p class="note">AGENTS.mdは、新しく入ったメンバーに最初に渡す「プロジェクトの取り扱い説明書」と考えると書きやすくなります。</p>
+      </article>
+      <article>
+        <h2>グローバルAGENTS.md</h2><p class="maker"><code>~/.codex/AGENTS.md</code></p>
+        <h3>記載例</h3><ul><li><pre># Personal Defaults
+- Use concise explanations.
+- Avoid risky operations.
+- Follow my preferred language and response style.</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>複数のプロジェクトで共通の個人ルールを書く</li><li>プロジェクト側のAGENTS.mdがあれば、そちらが優先される</li></ul>
+        <p class="note">「グローバルで土台を作り、プロジェクトごとの差分だけ追加する」という2段構成で管理できます。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">書き方のテクニック</h2>
+    <div class="grid">
+      <article>
+        <h2>検証コマンドを書く</h2><p class="maker">テスト・ビルド・Lint</p>
+        <h3>記載例</h3><ul><li><pre># Validation
+Test:
+pnpm test
+Build:
+pnpm build
+Lint:
+pnpm lint</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>推測ではなく、実際のコマンドをそのまま書く</li><li>コード変更後にCodex自身がテストを実行・修正しやすくなる</li></ul>
+        <p class="note">毎回「テストしてください」と指示しなくても、検証まで進めてくれるようになります。</p>
+      </article>
+      <article>
+        <h2>禁止事項を書く</h2><p class="maker">安全設計</p>
+        <h3>記載例</h3><ul><li><pre># Do Not
+- Do not force push.
+- Do not modify .env files.
+- Do not touch authentication secrets.</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>「やって良いこと」より「やってはいけないこと」を優先して書く</li><li>安全に関わる内容は箇条書きで目立たせる</li></ul>
+        <p class="note">推奨ルールは状況によって無視されることがある一方、禁止ルールは明確な境界線として強く働きます。</p>
+      </article>
+      <article>
+        <h2>モノレポでの階層配置</h2><p class="maker">ルート ＋ サブディレクトリ</p>
+        <h3>構成例</h3><ul><li><pre>repository/
+├─ AGENTS.md        # 全パッケージ共通のルール
+├─ web/
+│  └─ AGENTS.md     # Web固有のルール
+└─ api/
+   └─ AGENTS.md     # API固有のルール</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>ルートには共通の規約と禁止事項を書く</li><li>編集中のファイルに最も近いAGENTS.mdが優先される</li></ul>
+        <p class="note">ルートの内容を土台に、サブディレクトリ側で必要な部分だけを追加・上書きできます。</p>
+      </article>
+      <article>
+        <h2>AI向けに短く書く</h2><p class="maker">命令形 ＋ 具体例</p>
+        <h3>記載例</h3><ul><li><pre># Rules
+- Run tests after modifying code.
+- Do not force push.
+- Do not edit .env files.
+
+# Good
+pnpm test
+# Bad
+Run whatever test command seems appropriate.</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>長い背景説明より、短い見出しと命令形で書く</li><li>良い例・悪い例を並べて誤解を減らす</li></ul>
+        <p class="note">READMEは人間向け、AGENTS.mdはCodex向けです。長く書くより、誤解なく短く伝えることを優先します。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="agents-md--note"><h2 id="agents-md--note">AGENTS.mdの基本</h2><p>AGENTS.mdは、Codexに「何をどうやるか」を伝える指示書です。どこまで操作を許可するかは<a href="#p-approval">承認・サンドボックス</a>、Codex自体の動作は<a href="#p-config">config.toml</a>で設定します。<code>/init</code>を使うと、既存プロジェクトを調べてAGENTS.mdのたたき台を作成できます。AGENTS.mdが長いと毎回のトークン消費が増えるため、短く保つことも大切です。</p></aside>
+
+    </section>
+    <section class="panel" id="p-config" aria-labelledby="t-config">
+      <div class="panel-head"><p class="eyebrow">CODEX / CONFIG.TOML</p><h2 class="panel-title" id="t-config">Codexのconfig.toml設定一覧</h2></div>
+
+    <h2 class="section-title">モデルと推論</h2>
+    <div class="grid">
+      <article>
+        <h2>モデルを固定する</h2><p class="maker"><code>model</code></p>
+        <h3>設定例</h3><ul><li><pre>model = &quot;&lt;使用するCodex対応モデル&gt;&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>起動のたびに同じモデルを使い、回答品質の土台を安定させる</li><li>別のモデルを試したいときだけ書き換える</li></ul>
+        <p class="note">モデルを指定しないと、その時点の既定モデルで動作するため、日によって回答の質が変わる可能性があります。</p>
+      </article>
+      <article>
+        <h2>推論の深さを切り替える</h2><p class="maker"><code>model_reasoning_effort</code></p>
+        <h3>設定例</h3><ul><li><pre>model_reasoning_effort = &quot;medium&quot;
+plan_mode_reasoning_effort = &quot;high&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>普段はmedium、軽い定型作業はlow、難しい設計やバグ調査はhigh</li><li>計画時だけ深く考えさせる設定もできる</li></ul>
+        <p class="note">推論を深くするほど時間とトークンを消費します。作業の難しさに合わせて切り替えます。</p>
+      </article>
+      <article>
+        <h2>プロファイルで切り替える</h2><p class="maker">会社用・個人用・検証用</p>
+        <h3>使いどころ・ポイント</h3><ul><li>モデルや承認方針など複数の設定を1つの名前で束ねる</li><li>起動時にプロファイル名を指定して丸ごと切り替える</li><li>会社のリポジトリでは承認を厳しめにする</li></ul>
+        <p class="note">設定ファイルを毎回手作業で書き換える必要がなくなります。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">表示・通知</h2>
+    <div class="grid">
+      <article>
+        <h2>ステータスライン</h2><p class="maker"><code>/statusline</code></p>
+        <h3>表示できる情報</h3><ul><li>コンテキスト残量</li><li>モデル・推論レベル</li><li>Gitブランチ・作業ディレクトリ</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>残量を見て、上限に達する前に作業を区切る</li><li><code>/statusline</code>から設定する</li></ul>
+        <p class="note">長い対話でも、重要な指示を見失う前に<code>/compact</code>や新しいセッションへ切り替えやすくなります。</p>
+      </article>
+      <article>
+        <h2>ターミナルタイトルと通知</h2><p class="maker">複数セッション・長い処理</p>
+        <h3>使いどころ・ポイント</h3><ul><li>タイトルを作業内容に合わせて変え、タブを見るだけでセッションを区別する</li><li>ビルドやテストなど長い処理の完了を、自作の通知スクリプトで受け取る</li></ul>
+        <p class="note">通知が多すぎると集中を妨げるため、本当に必要な種類だけに絞ります。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">機能の有効化と書き方</h2>
+    <div class="grid">
+      <article>
+        <h2>機能フラグとマルチエージェント</h2><p class="maker"><code>[features]</code> / <code>[agents]</code></p>
+        <h3>設定例</h3><ul><li><pre>[features]
+multi_agent = true
+hooks = true
+
+[agents]
+max_concurrent_threads_per_session = 4</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>サブエージェントやHooksを使うときに有効化する</li><li>同時に動かすスレッド数の上限を決める</li></ul>
+        <p class="note"><code>multi_agent = true</code>をトップレベルに書いたり、同じテーブルを離れた場所で再定義したりしないよう注意してください。</p>
+      </article>
+      <article>
+        <h2>環境変数・履歴・信頼するプロジェクト</h2><p class="maker"><code>[shell_environment_policy]</code> ほか</p>
+        <h3>設定例</h3><ul><li><pre>[shell_environment_policy]
+inherit = &quot;all&quot;
+
+[history]
+persistence = &quot;save-all&quot;
+
+[projects.&quot;C:/work/project&quot;]
+trust_level = &quot;trusted&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>テーブル名はドットで階層を表す</li><li>パスなど記号を含むキーは引用符で囲む</li></ul>
+        <p class="note">古い設定例をそのままコピーせず、使っているCodexのバージョンで対応しているか公式ドキュメントで確認してから追加します。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">利用枠を節約する</h2>
+    <div class="grid">
+      <article>
+        <h2>トークン消費を抑える7つの方法</h2><p class="maker">設定 ＋ 運用</p>
+        <h3>方法</h3><ul><li>モデルのグレードを下げる</li><li>高速モード（Fast Mode）を避ける</li><li>起動するディレクトリの階層に注意する</li><li>AGENTS.mdを短くする</li><li>サブエージェント（並列処理）は必要なときだけ使う</li><li>プロンプトで読む範囲を具体的に指示する</li><li>タスクごとにセッションを分ける</li></ul>
+        <p class="note">利用枠（Usage Limit）とコンテキストウィンドウは別物です。どちらを節約したいのかを意識して使い分けます。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="config--note"><h2 id="config--note">config.tomlの置き場所</h2><p>Codexの設定は<code>~/.codex/config.toml</code>（Windowsでは<code>%USERPROFILE%\.codex\config.toml</code>）で管理します。プロジェクト用の設定は<code>&lt;project&gt;/.codex/config.toml</code>に置けます。すべてを一度に設定する必要はありません。気になる設定を1つ追加し、実際の作業で使いながら調整していきます。</p></aside>
+
+    </section>
+    <section class="panel" id="p-plugins" aria-labelledby="t-plugins">
+      <div class="panel-head"><p class="eyebrow">CODEX / PLUGINS</p><h2 class="panel-title" id="t-plugins">Codexのプラグイン一覧</h2></div>
+
+    <h2 class="section-title">開発の進め方を変えるプラグイン</h2>
+    <div class="grid">
+      <article>
+        <h2>Superpowers</h2><p class="maker">開発 / 品質</p>
+        <h3>できること</h3><ul><li>計画・実装・レビュー・検証の流れを守らせる</li></ul>
+        <h3>使い方の例</h3><ul><li>機能追加を依頼すると、すぐ実装せず、まず計画とテストを整えてからコードを書く</li></ul>
+        <p class="note">大きめの開発ほど仕上がりの品質差が出やすく、最初の1本として紹介されています。</p>
+      </article>
+      <article>
+        <h2>Grill Me</h2><p class="maker">要件 / 事前確認</p>
+        <h3>できること</h3><ul><li>実装前にAIから質問攻めにしてもらい、要件の穴を見つける</li></ul>
+        <h3>使い方の例</h3><ul><li>新機能の仕様を渡すと、例外時の扱いや前提条件をAIが先回りして質問する</li></ul>
+        <p class="note">コードを書いた後に直すより、書く前に方向の誤りに気づく方が時間もコストも抑えられます。</p>
+      </article>
+      <article>
+        <h2>Fix CI</h2><p class="maker">GitHub / CI</p>
+        <h3>できること</h3><ul><li>CIの失敗ログを読み込み、原因の特定から修正案の作成まで行う</li></ul>
+        <h3>使い方の例</h3><ul><li>pushした直後にCIが失敗したら、ログ調査から修正案作成までを任せる</li></ul>
+        <p class="note">開発後半のトラブル対応を短縮できます。</p>
+      </article>
+      <article>
+        <h2>Yeet</h2><p class="maker">Git / PR</p>
+        <h3>できること</h3><ul><li>コミット・push・PR文面の作成など、実装後の手続きをまとめて実行</li></ul>
+        <h3>使い方の例</h3><ul><li>実装完了後に呼び出し、コミットからPR作成までを進める</li></ul>
+        <p class="note">mainへ直接pushしない運用ルールと合わせて使ってください。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">仕事の道具とつなぐプラグイン</h2>
+    <div class="grid">
+      <article>
+        <h2>Slack</h2><p class="maker">コミュニケーション</p>
+        <h3>できること</h3><ul><li>メッセージの要約・返信の下書き・完了報告</li></ul>
+        <h3>使い方の例</h3><ul><li>「今日の議論をまとめて」と頼み、長いチャンネルを要点だけに整理する</li></ul>
+        <p class="note">初回のみ認証が必要です。会社で使う場合は管理者の許可が必要なことがあります。</p>
+      </article>
+      <article>
+        <h2>Linear</h2><p class="maker">タスク管理</p>
+        <h3>できること</h3><ul><li>チケットを読んで実装し、状態を更新する</li></ul>
+        <h3>使い方の例</h3><ul><li>チケットのURLだけを渡し、背景確認から実装まで進めてもらう</li></ul>
+        <p class="note">チケット内容をコピーして説明し直す手間がなくなります。</p>
+      </article>
+      <article>
+        <h2>Figma</h2><p class="maker">デザイン</p>
+        <h3>できること</h3><ul><li>デザインの配色・余白のルールを読み取ってコードを生成</li></ul>
+        <h3>使い方の例</h3><ul><li>画面デザインのURLから、色や余白の意図を読み取って実装する</li></ul>
+        <p class="note">デザインと実装の往復を減らせます。</p>
+      </article>
+      <article>
+        <h2>Gmail</h2><p class="maker">メール</p>
+        <h3>できること</h3><ul><li>受信箱の整理・返信の下書き</li></ul>
+        <h3>使い方の例</h3><ul><li>朝の受信箱を重要度別に整理し、優先して返すメールの下書きを用意する</li></ul>
+        <p class="note">外部サービスに接続するため、許可する操作の範囲を確認してから使ってください。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">品質・レビューを支えるプラグイン</h2>
+    <div class="grid">
+      <article>
+        <h2>Codex Security</h2><p class="maker">OpenAI公式 / 脆弱性</p>
+        <h3>できること</h3><ul><li>攻撃されやすい実装や認証情報の扱いをチェック</li></ul>
+        <h3>使い方の例</h3><ul><li>実装後のコードに、攻撃経路になり得る実装がないかを確認する</li></ul>
+        <p class="note">AIが書いたコードの「守り」を補います。</p>
+      </article>
+      <article>
+        <h2>Codex Plugin（Claude Code向け）</h2><p class="maker">OpenAI公式 / AIレビュー</p>
+        <h3>できること</h3><ul><li>Claude Code内からCodexのレビューを呼び出す</li></ul>
+        <h3>使い方の例</h3><ul><li>一方のAIが実装したコードを、別のAIにレビューさせる</li></ul>
+        <p class="note">AI同士のレビューを完全自動にすると、修正を繰り返して利用枠を消費し続けることがあります。大事な場面で手動で呼ぶのが安全です。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="plugins--note"><h2 id="plugins--note">プラグインの導入と注意点</h2><p>プラグインは、Skills・Hooks・コマンド・外部連携などをまとめて追加する拡張機能です。<code>/plugins</code>から検索してInstallし、外部サービス連携は初回に認証します。スキル単体なら、組み込みのスキルインストーラーに欲しい機能を伝えて追加することもできます。外部から取得したプラグインやスキルには、危険な命令や情報を盗む仕組みが含まれる事例が報告されています。公式カタログや実績のある定番を中心に選び、出所の分からないものは中身を確認してから導入してください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-skills" aria-labelledby="t-skills">
+      <div class="panel-head"><p class="eyebrow">CODEX / SKILLS</p><h2 class="panel-title" id="t-skills">CodexのSkills一覧</h2></div>
+
+    <h2 class="section-title">Skillの作り方</h2>
+    <div class="grid">
+      <article>
+        <h2>最小構造のSkill</h2><p class="maker"><code>SKILL.md</code></p>
+        <h3>記載例</h3><ul><li><pre>---
+name: react-review
+description: ReactのTSX/JSXをレビューするときに使う。VueやSvelteのときは使わない。
+---
+# 使う条件
+React コンポーネントの変更をレビューするとき
+
+# 手順
+1. 変更されたTSX/JSXを確認する
+2. レビュー観点に沿って指摘する</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>フロントマターに名前と説明、本文に「使う条件」と「手順」を書く</li><li>参考スクリプトや例文は、必要になってから追加する</li></ul>
+        <p class="note">毎回チャットに貼っているレビュー観点や作業手順は、Skillにすると誰がいつ使っても同じ品質で再利用できます。</p>
+      </article>
+      <article>
+        <h2>説明文で発火条件を絞る</h2><p class="maker"><code>description</code></p>
+        <h3>良い例・悪い例</h3><ul><li>良い例：「ReactのTSXやJSXを触るときに使う。VueやSvelteのときは使わない」</li><li>悪い例：一般的すぎる説明（毎回発火してしまう）</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>「いつ使うか」と「いつ使わないか」の両方を書く</li></ul>
+        <p class="note">Codexは説明文を読んでSkillを使うかどうかを判断するため、自動発火の精度は説明文で決まります。</p>
+      </article>
+      <article>
+        <h2>補助スクリプト付きのSkill</h2><p class="maker"><code>scripts/</code></p>
+        <h3>構成例</h3><ul><li><pre>my-skill/
+├── SKILL.md
+├── scripts/      # 自動処理用スクリプト（例: check.js）
+├── references/   # Skillが参照する資料
+└── assets/       # テンプレートなど</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>本文に「scripts/check.js をNodeで実行する」のように書く</li><li>Lintや独自チェッカーをSkillに組み込む</li></ul>
+        <p class="note">SKILL.md以外のフォルダーは任意です。必要になったものから追加します。</p>
+      </article>
+      <article>
+        <h2>$skill-creatorで作らせる</h2><p class="maker"><code>$skill-creator</code></p>
+        <h3>使い方の例</h3><ul><li><code>$skill-creator</code>を実行し、「Create a skill for creating software requirements documents.」のように依頼する</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>ひな型をゼロから設計せず、生成されたSKILL.mdをプロジェクトに合わせて調整する</li></ul>
+        <p class="note">何をするか・いつ使うか・どんな手順か・スクリプトが必要か、を整理しながら作成してくれます。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">置き場所と共有</h2>
+    <div class="grid">
+      <article>
+        <h2>個人用とチーム用の使い分け</h2><p class="maker">グローバル / リポジトリ</p>
+        <h3>置き場所</h3><ul><li><code>~/.codex/skills</code>：自分の手癖・個人向けのSkill</li><li>リポジトリ内のSkillフォルダー：チーム全員に守らせたい作法（記事により<code>.codex/skills</code>・<code>.agents/skills</code>の例があります）</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>同じ名前のSkillをグローバルとリポジトリの両方に置かない</li></ul>
+        <p class="note">どちらが優先されるかで問題が起きるため、用途で置き場所を分けます。導入状況は<code>/skills</code>で確認できます。</p>
+      </article>
+      <article>
+        <h2>チームで共有する3パターン</h2><p class="maker">共有範囲で選ぶ</p>
+        <h3>方法</h3><ul><li>1リポジトリだけ：リポジトリにSkillフォルダーを置いてコミット</li><li>複数リポジトリ：プラグインとしてパッケージ化して配布</li><li>組織全体：社内のSkillカタログ（組織レジストリ）から配信</li></ul>
+        <p class="note">共有範囲と更新頻度のバランスで選びます。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="skills--note"><h2 id="skills--note">Skillsの基本</h2><p>Skillは、繰り返す作業の手順や知識をまとめた「AIに読ませるレシピ」です。Agentが「誰が担当するか」を決めるのに対し、Skillは「どうやって作業するか」を決めます。最初から複雑なSkillを作らず、1ファイルの最小構造から始め、条件・スクリプト・共有方法を少しずつ広げていきます。外部から取得したSkillは、中身を確認してから導入してください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-mcp" aria-labelledby="t-mcp">
+      <div class="panel-head"><p class="eyebrow">CODEX / MCP</p><h2 class="panel-title" id="t-mcp">CodexのMCP設定一覧</h2></div>
+
+    <h2 class="section-title">接続と確認</h2>
+    <div class="grid">
+      <article>
+        <h2>MCPサーバーを登録する</h2><p class="maker"><code>codex mcp add</code></p>
+        <h3>実行例</h3><ul><li><pre>codex mcp add &lt;サーバー名&gt; -- &lt;起動コマンド&gt;
+codex mcp list</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>サーバー名と起動コマンドを渡して登録する</li><li><code>codex mcp list</code>で接続中のサーバーを確認する</li><li>セッション中は<code>/mcp</code>で使える状態かを確認できる</li></ul>
+        <p class="note">最初から多数のツールを接続せず、毎日使うツールを1つ接続するところから始めます。</p>
+      </article>
+      <article>
+        <h2>config.tomlで設定する</h2><p class="maker"><code>[mcp_servers.&lt;名前&gt;]</code></p>
+        <h3>設定例</h3><ul><li><pre>[mcp_servers.github]
+url = &quot;https://example.com/github-mcp&quot;
+bearer_token_env_var = &quot;GITHUB_TOKEN&quot;
+enabled = true</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>トークンは設定ファイルに直接書かず、環境変数名で指定する</li><li>使わないサーバーは<code>enabled = false</code>で無効化する</li></ul>
+        <p class="note">URLは例です。実際の接続先は各MCPサーバーの公式ドキュメントで確認してください。</p>
+      </article>
+      <article>
+        <h2>認証が必要なMCP</h2><p class="maker">ブラウザでのログイン</p>
+        <h3>流れ</h3><ul><li>Codexから認証を開始するとブラウザが起動する</li><li>サービスの同意画面で許可する</li><li>トークンが手元に保存され、次回以降は自動で認証される</li></ul>
+        <p class="note">GitHubやSlackのようにユーザー認証が必要なサービスでは、初回のログインフローを理解しておきます。</p>
+      </article>
+      <article>
+        <h2>つながらないときの診断</h2><p class="maker"><code>codex mcp get</code></p>
+        <h3>確認できること</h3><ul><li>サーバーごとの状態</li><li>起動結果</li><li>最後のエラーメッセージ</li></ul>
+        <h3>よくある原因</h3><ul><li>起動コマンドの書き間違い</li><li>必要な環境変数の設定不足</li></ul>
+        <p class="note">症状と切り分けの観点をパターン化しておくと、トラブル解決が速くなります。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">安全に使う</h2>
+    <div class="grid">
+      <article>
+        <h2>STDIOとHTTPの使い分け</h2><p class="maker">トランスポート</p>
+        <h3>方式</h3><ul><li>STDIO：Codexがツールを起動し、標準入出力でやり取りする。手元で完結する軽いツール向け</li><li>HTTP：常駐しているサーバーにネットワーク越しに接続する。複数の端末で共有したい場合向け</li></ul>
+      </article>
+      <article>
+        <h2>許可リストでツールを絞る</h2><p class="maker">ツールの許可リスト</p>
+        <h3>使いどころ・ポイント</h3><ul><li>1つのMCPサーバーが公開する多数のツールのうち、使うものだけを名前で許可する</li><li>削除・送信など意図せず実行されたくない操作は許可しない</li></ul>
+        <p class="note">利用するツールを設定側で絞ると、破壊的な操作を防げるため自動化を任せやすくなります。</p>
+      </article>
+      <article>
+        <h2>MCPとApps / Connectorsの使い分け</h2><p class="maker">連携方式</p>
+        <h3>方式</h3><ul><li>MCP：自分でサーバーを立てて直接つなぐ。独自ロジックを細かく仕込みたい場合</li><li>Apps / Connectors：運営側が用意した接続口。代表的なツールに手軽につなぎたい場合</li></ul>
+        <p class="note">自由度と運用の負担のバランスで選びます。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="mcp--note"><h2 id="mcp--note">MCPの基本</h2><p>MCPは、Codexを外部のツールやサービスにつなぐ仕組みです。<code>codex mcp add</code>で登録し、<code>codex mcp list</code>・<code>/mcp</code>で確認、<code>codex mcp get</code>で診断します。書き込みや送信ができるツールは許可リストで絞り、トークンなどの秘密情報は環境変数で管理してください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-subagents" aria-labelledby="t-subagents">
+      <div class="panel-head"><p class="eyebrow">CODEX / SUBAGENTS</p><h2 class="panel-title" id="t-subagents">CodexのSubagents（Custom Agent）一覧</h2></div>
+
+    <h2 class="section-title">Custom Agentの作り方</h2>
+    <div class="grid">
+      <article>
+        <h2>Architect Agent</h2><p class="maker"><code>.codex/agents/architect.toml</code></p>
+        <h3>定義例</h3><ul><li><pre>name = &quot;architect&quot;
+description = &quot;&quot;&quot;
+Software architect responsible for requirements,
+architecture, API design and database design.
+&quot;&quot;&quot;
+model_reasoning_effort = &quot;high&quot;
+sandbox_mode = &quot;read-only&quot;
+developer_instructions = &quot;&quot;&quot;
+You are the software architect for this project.
+- analyze requirements
+- create and update design documents
+- identify contradictions between requirements and architecture
+Do not implement application code unless explicitly requested.
+&quot;&quot;&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li><code>name</code>・<code>description</code>・<code>developer_instructions</code>は最低限定義する</li><li>設計担当は<code>sandbox_mode = &quot;read-only&quot;</code>でコードを書き換えさせない</li></ul>
+        <p class="note">特に重要なのは<code>description</code>です。Codexが「どのAgentに任せるか」を判断する材料になるため、担当範囲を明確に書きます。</p>
+      </article>
+      <article>
+        <h2>Review Agent</h2><p class="maker">レビュー専門</p>
+        <h3>役割の例</h3><ul><li>バグ・セキュリティ問題・コーディング規約違反・テスト不足の検出</li><li>結果を<code>review-report.md</code>に出力</li></ul>
+        <h3>禁止事項の例</h3><ul><li>ソースコードを直接変更しない</li><li>問題のないコードを不必要に変更しない</li></ul>
+        <p class="note">レビュー方法や観点を毎回判断させず、役割を限定することで結果が安定します。</p>
+      </article>
+      <article>
+        <h2>Builder / Tester</h2><p class="maker">実装担当・テスト担当</p>
+        <h3>役割の例</h3><ul><li>Builder：implementation・refactoring・migration などのSkillを使って実装する</li><li>Tester：テスト仕様書の作成とテストの実行</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>developer_instructionsに、どのSkillを使うべきかを明示する</li></ul>
+        <p class="note">Agentは「誰が担当するか」、Skillは「どうやって作業するか」と分けて考えると設計しやすくなります。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">構成と運用</h2>
+    <div class="grid">
+      <article>
+        <h2>Main AgentとSubagent</h2><p class="maker">Orchestrator ＋ 担当Agent</p>
+        <h3>役割</h3><ul><li>Main Agent：作業を分解し、適したAgentへ委譲して全体を管理する</li><li>Subagent：Main Agentから渡された限定的な仕事を処理する</li></ul>
+        <h3>タスクの渡し方の例</h3><ul><li>×「プロジェクトを改善してください」</li><li>○「src/parser配下を解析し、YAML解析処理の問題点だけを報告してください。ファイルは変更しないでください。」</li></ul>
+        <p class="note">Subagentには、境界のはっきりしたタスク（Bounded Task）を渡します。</p>
+      </article>
+      <article>
+        <h2>プロジェクト構成</h2><p class="maker">Agent と Skill の置き場所</p>
+        <h3>構成例</h3><ul><li><pre>my-project/
+├── .codex/
+│   ├── config.toml
+│   └── agents/
+│       ├── architect.toml
+│       ├── builder.toml
+│       ├── tester.toml
+│       └── reviewer.toml
+└── .agents/
+    └── skills/
+        ├── requirements/SKILL.md
+        └── code-review/SKILL.md</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>プロジェクト用は<code>&lt;project&gt;/.codex/agents/</code>、共通用は<code>~/.codex/agents/</code></li></ul>
+        <p class="note">プロジェクト固有のAgentはリポジトリと一緒に管理すると扱いやすくなります。</p>
+      </article>
+      <article>
+        <h2>並列実行の注意点</h2><p class="maker"><code>[agents]</code></p>
+        <h3>使いどころ・ポイント</h3><ul><li>依存関係のない調査・解析・テスト作成・レビューを並列で進める</li><li><code>max_concurrent_threads_per_session</code>で同時実行数を制限する</li><li>Agentを増やしすぎない</li></ul>
+        <p class="note">並列実行するとAgentごとにコンテキストを消費するため、トークン使用量が増えます。必要なときだけ使います。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="subagents--note"><h2 id="subagents--note">Subagentsの基本</h2><p>Codexでは複数のAgentに作業を分担できます。Custom Agentは役割・指示・モデル・推論レベル・権限などを調整したAgentで、TOMLで定義します。使う前に<code>config.toml</code>の<code>[features]</code>で<code>multi_agent = true</code>を有効にし、<code>/agents</code>で確認します。AGENTS.mdは「守るべきルール」、Custom Agentは「担当者」、Skillは「作業手順」と役割を分けてください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-hooks" aria-labelledby="t-hooks">
+      <div class="panel-head"><p class="eyebrow">CODEX / HOOKS</p><h2 class="panel-title" id="t-hooks">CodexのHooks一覧</h2></div>
+
+    <h2 class="section-title">Hooksを使い始める</h2>
+    <div class="grid">
+      <article>
+        <h2>Hooksを有効化する</h2><p class="maker"><code>[features] hooks = true</code></p>
+        <h3>設定例</h3><ul><li><pre>[features]
+hooks = true</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li><code>config.toml</code>の<code>[features]</code>テーブルの中に書く</li><li>トップレベルに書かない</li></ul>
+        <p class="note">同じ<code>[features]</code>テーブルを離れた場所で再定義せず、<code>multi_agent</code>などと1か所にまとめて書きます。</p>
+      </article>
+      <article>
+        <h2>イベントに合わせて処理する</h2><p class="maker">ツール実行前・処理停止時</p>
+        <h3>できること</h3><ul><li>ツール実行前に処理を挟む</li><li>処理が止まったときに処理を挟む</li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li><code>/hooks</code>で登録状況を確認する</li></ul>
+        <p class="note">記事で触れられているのはこの2つのタイミングです。イベントの全一覧や書き方は公式ドキュメントで確認してください。</p>
+      </article>
+      <article>
+        <h2>プラグインで配布されるHooks</h2><p class="maker"><code>/plugins</code></p>
+        <h3>使いどころ・ポイント</h3><ul><li>プラグインにはSkills・コマンドと一緒にHooksが含まれることがある</li><li>導入前に、どんなHookが含まれているかを確認する</li></ul>
+        <p class="note">Hookは自動で実行されるため、出所の分からないプラグインに含まれるHookには特に注意してください。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="hooks--note"><h2 id="hooks--note">Hooksについて</h2><p>本サイトのCodex記事では、Hooksは有効化の設定と<code>/hooks</code>での確認方法が中心で、具体的な設定例は紹介されていません。Claude CodeのHooksの使い方は<a href="claude-code-guide.html#p-hooks">Claude Code設定ガイド</a>のHooksを参考にしてください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-approval" aria-labelledby="t-approval">
+      <div class="panel-head"><p class="eyebrow">CODEX / APPROVAL & SANDBOX</p><h2 class="panel-title" id="t-approval">Codexの承認・サンドボックス設定一覧</h2></div>
+
+    <h2 class="section-title">サンドボックス（どこまで触れてよいか）</h2>
+    <div class="grid">
+      <article>
+        <h2>read-only</h2><p class="maker"><code>sandbox_mode = &quot;read-only&quot;</code></p>
+        <h3>設定例</h3><ul><li><pre>sandbox_mode = &quot;read-only&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>ファイルを書き換えず、読むだけに限定する</li><li>設計レビュー・原因調査・他人のコードを安全に読ませたいとき</li></ul>
+        <p class="note">「問題点を調査してほしいが、ファイルは変更しないでほしい」作業に向いています。</p>
+      </article>
+      <article>
+        <h2>workspace-write</h2><p class="maker"><code>sandbox_mode = &quot;workspace-write&quot;</code></p>
+        <h3>設定例</h3><ul><li><pre>sandbox_mode = &quot;workspace-write&quot;
+
+[sandbox_workspace_write]
+network_access = false</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>作業ディレクトリの中だけ書き換えられる</li><li>外部ネットワークは遮断し、ソースコードや鍵が外に出る経路を閉じる</li><li>依存パッケージの取得など必要なときだけ<code>network_access = true</code></li></ul>
+        <p class="note">read-onlyでは作業が進まず、danger-full-accessは危険すぎるため、その中間の「日常の正解」とされています。</p>
+      </article>
+      <article>
+        <h2>danger-full-access</h2><p class="maker"><code>sandbox_mode = &quot;danger-full-access&quot;</code></p>
+        <h3>設定例</h3><ul><li><pre>sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>読み書き・ネットワークの制限を外す最終手段</li><li>捨ててもよい隔離環境・開発専用VMでのみ使う</li></ul>
+        <p class="note">1つの削除コマンドで本番DBを復旧できなくする事故も起こり得ます。常用せず、使い終わったら必ず元の設定に戻してください。</p>
+      </article>
+      <article>
+        <h2>writable roots</h2><p class="maker"><code>writable_roots</code></p>
+        <h3>設定例</h3><ul><li><pre>[sandbox_workspace_write]
+writable_roots = [&quot;C:/work&quot;, &quot;C:/temp&quot;]</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>書き込んでよいディレクトリを明示的に並べる</li><li>隣のリポジトリやホーム直下などへの誤書き込みを防ぐ</li></ul>
+        <p class="note">workspace-writeよりさらに厳密に書き込み範囲を絞りたいときに追加します。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">承認モード（いつ人間に確認するか）</h2>
+    <div class="grid">
+      <article>
+        <h2>on-request</h2><p class="maker"><code>approval_policy = &quot;on-request&quot;</code></p>
+        <h3>設定例</h3><ul><li><pre>approval_policy = &quot;on-request&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>危険な操作のときだけ承認を求める</li><li>日常の開発作業の初期値</li></ul>
+        <p class="note">毎回確認される煩わしさと、まったく確認されない怖さの中間です。</p>
+      </article>
+      <article>
+        <h2>never</h2><p class="maker"><code>approval_policy = &quot;never&quot;</code></p>
+        <h3>設定例</h3><ul><li><pre>approval_policy = &quot;never&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>承認を一切求めない</li><li>CIや無人のバッチ処理で使う</li></ul>
+        <p class="note"><code>approval_policy = &quot;never&quot;</code>だけでPC全体を操作できるわけではなく、実際に操作できる範囲はサンドボックスが決めます。開発機での常用は安全弁を外すことになるため注意してください。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title">組み合わせの例</h2>
+    <div class="grid">
+      <article>
+        <h2>基本セット</h2><p class="maker">日常の開発</p>
+        <h3>設定例</h3><ul><li><pre>approval_policy = &quot;on-request&quot;
+sandbox_mode = &quot;workspace-write&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>AGENTS.mdと合わせた3点セットで運用する</li><li>さらに範囲を絞りたいときだけwritable rootsを追加</li></ul>
+        <p class="note">「暴走」と「過剰な確認」の両方を避け、速度を落とさずに運用できる組み合わせです。</p>
+      </article>
+      <article>
+        <h2>承認を減らしてサンドボックスは残す</h2><p class="maker">VS Codeでの長時間作業</p>
+        <h3>設定例</h3><ul><li><pre>approval_policy = &quot;never&quot;
+sandbox_mode = &quot;workspace-write&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>承認待ちで止まらずに実装・テストを進めさせる</li><li>操作範囲はサンドボックスで制限したまま</li></ul>
+        <p class="note">承認をなくしたいなら<code>approval_policy</code>、操作範囲を広げたいなら<code>sandbox_mode</code>と、分けて設定します。</p>
+      </article>
+      <article>
+        <h2>自律実行を最優先</h2><p class="maker">隔離環境・開発専用VMのみ</p>
+        <h3>設定例</h3><ul><li><pre>approval_policy = &quot;never&quot;
+sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
+        <h3>使いどころ・ポイント</h3><ul><li>無人で自律実行させる</li><li>通常のPCでは使わない</li></ul>
+        <p class="note">承認なし＋広範囲なアクセスになるため、OSへの影響範囲が大きくなります。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="approval--note"><h2 id="approval--note">承認・サンドボックスの基本</h2><p>Codexの権限は、承認モード（<code>approval_policy</code>：確認するか）とサンドボックス（<code>sandbox_mode</code>：どこまで実行できるか）の2つのダイヤルで決まります。設定は<code>config.toml</code>に書き、セッション中は<code>/permissions</code>で切り替え、<code>/status</code>で現在の状態を確認できます。最初は狭い範囲から始め、必要な範囲だけを明示的に広げてください。</p></aside>
+
+    </section>
+    <section class="panel" id="p-slash-commands" aria-labelledby="t-slash-commands">
+      <div class="panel-head"><p class="eyebrow">CODEX / SLASH COMMANDS</p><h2 class="panel-title" id="t-slash-commands">Codexのスラッシュコマンド一覧</h2></div>
+
+    <h2 class="section-title">セッション運用・コンテキスト管理</h2>
+    <div class="grid">
+      <article>
+        <h2><code>/new</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>画面の結果は残したまま、コンテキストをきれいにして新しい会話を始める</li></ul>
+        <h3>使いどころ</h3><ul><li>別のタスクに切り替えるとき</li></ul>
+        <p class="note"><code>/clear</code>は画面の表示も含めてクリアします。</p>
+      </article>
+      <article>
+        <h2><code>/compact</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>これまでのやり取りを保持したまま会話履歴を圧縮する</li></ul>
+        <h3>使いどころ</h3><ul><li>長時間の作業でコンテキストが増えてきたとき</li></ul>
+        <p class="note">「今までの話は引き継ぎたいが、コンテキストの使用量は減らしたい」ときに使います。</p>
+      </article>
+      <article>
+        <h2><code>/resume</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>過去のセッション一覧から選んで再開する</li></ul>
+        <h3>使いどころ</h3><ul><li>前日の作業を続けるとき</li></ul>
+        <p class="note"><code>/title</code>で分かりやすい名前を付けておくと、目的のセッションを見つけやすくなります。</p>
+      </article>
+      <article>
+        <h2><code>/side</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>メインのコンテキストを汚さずに横道の質問をする</li></ul>
+        <h3>使いどころ</h3><ul><li>作業中に出てきた用語をちょっと確認したいとき</li></ul>
+        <p class="note">質問と回答がメインの会話に追加されないため、コンテキストを節約できます。</p>
+      </article>
+      <article>
+        <h2><code>/fork</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>同じ起点から会話を分岐する</li></ul>
+        <h3>使いどころ</h3><ul><li>複数のアプローチを比べたいとき</li></ul>
+      </article>
+      <article>
+        <h2><code>/ide</code></h2><p class="maker">コンテキスト</p>
+        <h3>できること</h3><ul><li>VS CodeなどのIDEで開いているファイルや選択内容をコンテキストに含める</li></ul>
+        <h3>使いどころ</h3><ul><li>ファイルパスの指定や中身の貼り付けを省きたいとき</li></ul>
+      </article>
+    </div>
+
+    <h2 class="section-title">計画・確認・レビュー</h2>
+    <div class="grid">
+      <article>
+        <h2><code>/plan</code></h2><p class="maker">計画</p>
+        <h3>できること</h3><ul><li>いきなり編集させず、先に計画を提示させる</li></ul>
+        <h3>使いどころ</h3><ul><li>複数ファイルを変更する作業の前</li></ul>
+        <p class="note">大量編集・手戻り・トークン消費を抑えられます。Plan Modeは<code>Shift+Tab</code>でも切り替えられます。</p>
+      </article>
+      <article>
+        <h2><code>/goal</code></h2><p class="maker">目標管理</p>
+        <h3>できること</h3><ul><li>目標や停止条件を指定し、達成するまで作業させる</li></ul>
+        <h3>使いどころ</h3><ul><li>「ユニットテストがすべて通るまで実装して」のように完了条件を決めたいとき</li></ul>
+        <p class="note">達成条件を具体的に書くことが重要です。</p>
+      </article>
+      <article>
+        <h2><code>/diff</code></h2><p class="maker">確認</p>
+        <h3>できること</h3><ul><li>編集後のGit差分をターミナルに表示する</li></ul>
+        <h3>使いどころ</h3><ul><li>意図しない行やファイルまで変更されていないかを確認するとき</li></ul>
+      </article>
+      <article>
+        <h2><code>/review</code></h2><p class="maker">レビュー</p>
+        <h3>できること</h3><ul><li>現在の差分をCodexにレビューさせる</li></ul>
+        <h3>使いどころ</h3><ul><li>コミット前に毎回通す</li></ul>
+        <p class="note">未コミットの差分だけなら<code>codex review --uncommitted</code>、ブランチ全体なら<code>--base main</code>を使います。実装とレビューでモデルを分ける運用もあります。</p>
+      </article>
+      <article>
+        <h2><code>/status</code></h2><p class="maker">状態確認</p>
+        <h3>できること</h3><ul><li>承認・サンドボックス・モデルなど現在の状態を確認する</li></ul>
+        <h3>使いどころ</h3><ul><li>作業を始める前の確認</li></ul>
+      </article>
+    </div>
+
+    <h2 class="section-title">モデル・権限・拡張</h2>
+    <div class="grid">
+      <article>
+        <h2><code>/model</code></h2><p class="maker">モデル</p>
+        <h3>できること</h3><ul><li>モデル・推論レベル（Low〜Extra High）・Personalityを設定する</li></ul>
+        <h3>使いどころ</h3><ul><li>コストと速度を調整したいとき</li></ul>
+        <p class="note"><code>/fast</code>を使うと、同じ機能のまま出力を速くできます（その分、利用枠の消費が増える場合があります）。</p>
+      </article>
+      <article>
+        <h2><code>/permissions</code></h2><p class="maker">権限</p>
+        <h3>できること</h3><ul><li>承認モードを切り替える</li></ul>
+        <h3>使いどころ</h3><ul><li>安全性と速度を使い分けたいとき</li></ul>
+        <p class="note">詳細は<a href="#p-approval">承認・サンドボックス</a>を参照してください。</p>
+      </article>
+      <article>
+        <h2><code>/init</code></h2><p class="maker">仕組み化</p>
+        <h3>できること</h3><ul><li>既存プロジェクトを調べてAGENTS.mdを作成する</li></ul>
+        <h3>使いどころ</h3><ul><li>AGENTS.mdのたたき台を作るとき</li></ul>
+      </article>
+      <article>
+        <h2>拡張機能の確認</h2><p class="maker">仕組み化・外部連携</p>
+        <h3>コマンド</h3><ul><li><code>/skills</code>：Skill一覧と有効・無効</li><li><code>/hooks</code>：Hooksの確認</li><li><code>/plugins</code>：プラグインの検索・導入</li><li><code>/agents</code>：サブエージェントの確認</li><li><code>/mcp</code>：MCPで使えるツールの確認</li><li><code>/memories</code>：セッションを超えて共有する情報の管理</li></ul>
+      </article>
+    </div>
+
+    <h2 class="section-title">表示・UI</h2>
+    <div class="grid">
+      <article>
+        <h2>表示を整えるコマンド</h2><p class="maker">表示・UI</p>
+        <h3>コマンド</h3><ul><li><code>/statusline</code>：モデル・Effort・プロジェクト・Gitブランチなどを表示</li><li><code>/title</code>：セッションに名前を付ける</li><li><code>/theme</code>：コード表示などの見た目を変える</li><li><code>/keymap</code>：ショートカットキーの一覧</li><li><code>/raw</code>：プレーンテキスト寄りの表示に切り替える</li><li><code>/copy</code>：出力をクリップボードへコピー</li><li><code>/exit</code>：セッションを終了</li></ul>
+        <p class="note">Codexが処理している最中でも、次の指示を入力しておけます。</p>
+      </article>
+    </div>
+
+    <aside class="guide" aria-labelledby="slash-commands--note"><h2 id="slash-commands--note">スラッシュコマンドの基本</h2><p>Codexのセッションで<code>/</code>を入力すると、使えるコマンドの候補が表示されます。すべてを暗記せず、「何をしたいか」から選べるようにしておくのがコツです。よく使う流れは、<code>/plan</code>で計画 → 実装 → <code>/diff</code>で変更確認 → <code>/review</code>でレビュー、長い作業では<code>/compact</code>、後日の再開は<code>/resume</code>です。</p></aside>
+
+    </section>
+    </main>
+  </div>
+<script>
+(function(){
+  var panels=[].slice.call(document.querySelectorAll('.panel'));
+  var navs=[].slice.call(document.querySelectorAll('[data-target]'));
+  var top=document.getElementById('content');
+  function show(hash,scroll){
+    var id=decodeURIComponent((hash||'').replace(/^#/,''));
+    var el=id?document.getElementById(id):null;
+    var panel=el?el.closest('.panel'):null;
+    if(!panel){panel=panels[0];el=null;}
+    panels.forEach(function(p){p.hidden=(p!==panel);});
+    navs.forEach(function(n){
+      var on=n.getAttribute('data-target')===panel.id;
+      n.setAttribute('aria-current',on?'page':'false');
+      if(n.getAttribute('role')==='tab'){n.setAttribute('aria-selected',on?'true':'false');n.tabIndex=on?0:-1;}
+    });
+    if(!scroll){return;}
+    if(el&&el!==panel){el.scrollIntoView();}
+    else if(scroll==='initial'){window.scrollTo(0,0);}
+    else if(top&&window.scrollY>top.offsetTop){window.scrollTo(0,top.offsetTop);}
+  }
+  window.addEventListener('hashchange',function(){show(location.hash,true);});
+  show(location.hash,location.hash?'initial':false);
+})();
+</script>
+<script>
+document.querySelectorAll('.panel article pre').forEach(function(pre){
+  var ul=pre.closest('ul');if(ul){ul.classList.add('code-list');}
+  var box=document.createElement('div');box.className='codebox';
+  pre.parentNode.insertBefore(box,pre);box.appendChild(pre);
+  var btn=document.createElement('button');btn.type='button';btn.className='copy';btn.textContent='コピー';
+  btn.addEventListener('click',function(){
+    if(!navigator.clipboard){return;}
+    navigator.clipboard.writeText(pre.textContent).then(function(){
+      btn.textContent='コピーしました';setTimeout(function(){btn.textContent='コピー';},1600);
+    });
+  });
+  box.appendChild(btn);
+});
+</script>
+</body>
+</html>
