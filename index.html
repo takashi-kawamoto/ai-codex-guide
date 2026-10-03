@@ -156,7 +156,7 @@ main{min-width:0;padding-top:0}
       <article>
         <h2><a href="#p-slash-commands">Codexのスラッシュコマンド一覧</a></h2><p class="maker">Slash Commands</p>
         <h3>わかること</h3><ul><li>よく使うコマンドの用途</li><li>計画・確認・レビューの流れ</li></ul>
-        <h3>主な掲載内容</h3><ul><li>/new・/compact・/resume・/side</li><li>/plan・/goal・/diff・/review</li><li>/model・/permissions・/init</li></ul>
+        <h3>主な掲載内容</h3><ul><li>/new・/compact・/resume・/side</li><li>/plan・/goal・/diff・/review</li><li>/recap・/copy・/export・/rename</li><li>/model・/permissions・/init</li></ul>
         <p class="note">セッション管理や変更確認など、毎日の操作で使うコマンドをまとめています。</p>
       </article>
     </div>
@@ -663,7 +663,7 @@ hooks = true</pre></li></ul>
       </article>
     </div>
 
-    <aside class="guide" aria-labelledby="hooks--note"><h2 id="hooks--note">Hooksについて</h2><p>本サイトのCodex記事では、Hooksは有効化の設定と<code>/hooks</code>での確認方法が中心で、具体的な設定例は紹介されていません。Claude CodeのHooksの使い方は<a href="claude-code-guide.html#p-hooks">Claude Code設定ガイド</a>のHooksを参考にしてください。</p></aside>
+    <aside class="guide" aria-labelledby="hooks--note"><h2 id="hooks--note">Hooksについて</h2><p>本サイトのCodex記事では、Hooksは有効化の設定と<code>/hooks</code>での確認方法が中心で、具体的な設定例は紹介されていません。Claude CodeのHooksの使い方は<a href="ai-claude-code-guide.html#p-hooks">Claude Code設定ガイド</a>のHooksを参考にしてください。</p></aside>
 
     </section>
     <section class="panel" id="p-approval" aria-labelledby="t-approval">
@@ -759,14 +759,14 @@ sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
       <article>
         <h2><code>/compact</code></h2><p class="maker">セッション</p>
         <h3>できること</h3><ul><li>これまでのやり取りを保持したまま会話履歴を圧縮する</li></ul>
-        <h3>使いどころ</h3><ul><li>長時間の作業でコンテキストが増えてきたとき</li></ul>
-        <p class="note">「今までの話は引き継ぎたいが、コンテキストの使用量は減らしたい」ときに使います。</p>
+        <h3>使いどころ</h3><ul><li>長時間の作業でコンテキストが増えてきたとき</li><li>長い調査や大量のログを扱った後</li></ul>
+        <p class="note">「今までの話は引き継ぎたいが、コンテキストの使用量は減らしたい」ときに使います。<code>/compact</code>はCodex（モデル）が次の処理に使う文脈を圧縮するもので、人が状況を思い出すための要約は<a href="#slash-commands--conversation"><code>/recap</code></a>です。</p>
       </article>
       <article>
         <h2><code>/resume</code></h2><p class="maker">セッション</p>
         <h3>できること</h3><ul><li>過去のセッション一覧から選んで再開する</li></ul>
         <h3>使いどころ</h3><ul><li>前日の作業を続けるとき</li></ul>
-        <p class="note"><code>/title</code>で分かりやすい名前を付けておくと、目的のセッションを見つけやすくなります。</p>
+        <p class="note"><code>/title</code>や<code>/rename</code>で分かりやすい名前を付けておくと、目的のセッションを見つけやすくなります。ターミナルからは<code>codex resume</code>で再開できます。</p>
       </article>
       <article>
         <h2><code>/side</code></h2><p class="maker">セッション</p>
@@ -802,8 +802,8 @@ sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
       </article>
       <article>
         <h2><code>/diff</code></h2><p class="maker">確認</p>
-        <h3>できること</h3><ul><li>編集後のGit差分をターミナルに表示する</li></ul>
-        <h3>使いどころ</h3><ul><li>意図しない行やファイルまで変更されていないかを確認するとき</li></ul>
+        <h3>できること</h3><ul><li>編集後のGit差分（未追跡ファイルを含む）をターミナルに表示する</li></ul>
+        <h3>使いどころ</h3><ul><li>意図しない行やファイルまで変更されていないかを確認するとき</li><li>「説明どおりに修正されているか」を確かめるとき</li></ul>
       </article>
       <article>
         <h2><code>/review</code></h2><p class="maker">レビュー</p>
@@ -813,8 +813,39 @@ sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
       </article>
       <article>
         <h2><code>/status</code></h2><p class="maker">状態確認</p>
-        <h3>できること</h3><ul><li>承認・サンドボックス・モデルなど現在の状態を確認する</li></ul>
-        <h3>使いどころ</h3><ul><li>作業を始める前の確認</li></ul>
+        <h3>できること</h3><ul><li>モデル・承認方針・書き込み可能な場所・トークン使用量など現在の状態を確認する</li></ul>
+        <h3>使いどころ</h3><ul><li>作業を始める前の確認</li><li>「同じ依頼なのに動きが違う」と感じたとき</li></ul>
+        <p class="note">要約に「テストは成功した」とあっても、その後にコードや環境が変わっていれば現在の成功は保証されません。再開時は<code>/status</code>と<code>/diff</code>で今の状態を確かめ、関係する検証を実行し直します。</p>
+      </article>
+    </div>
+
+    <h2 class="section-title" id="slash-commands--conversation">会話の要約・コピー・記録</h2>
+    <div class="grid">
+      <article>
+        <h2><code>/recap</code></h2><p class="maker">要約</p>
+        <h3>できること</h3><ul><li>会話を要約し、人が作業の状況を思い出せるようにする</li></ul>
+        <h3>使いどころ</h3><ul><li>中断していた作業を再開するとき</li><li>長いやり取りを最初から読み直さずに概要をつかみたいとき</li></ul>
+        <h3>自動リキャップを無効にする設定例</h3><ul><li><pre>[tui]
+auto_recap = false</pre></li></ul>
+        <p class="note">設定は<code>config.toml</code>に書きます。自動リキャップを無効にしても手動の<code>/recap</code>は使えます。要約は現在のコードの状態やテストの成功を保証しません。</p>
+      </article>
+      <article>
+        <h2><code>/copy</code></h2><p class="maker">出力の取得</p>
+        <h3>できること</h3><ul><li>最新の完了済みの返答から、全体・コードブロック・引用などを選んでコピーする</li><li><code>Ctrl+O</code>で最新の完了した返答をコピーできる</li></ul>
+        <h3>使いどころ</h3><ul><li>PR説明文やコード、設定の断片を別の場所へ貼り付けるとき</li></ul>
+        <p class="note">Codexの作業中に実行すると、生成途中ではなく1つ前に完了した出力がコピーされます。修正前の結果を修正後の検証結果として扱わないよう、貼り付ける前に差分や実行結果と照合してください。</p>
+      </article>
+      <article>
+        <h2><code>/export</code></h2><p class="maker">記録</p>
+        <h3>できること</h3><ul><li>会話全体をMarkdown形式で書き出す（クリップボードか新しいファイルを選べる）</li></ul>
+        <h3>使いどころ</h3><ul><li>否定した仮説や方針変更も含め、調査・判断の経緯を残したいとき</li><li>保存先から対応するPRやコミットを参照し、「なぜ変えたか」と実際の変更を突き合わせるとき</li></ul>
+        <p class="note">書き出した会話には貼り付けたログ・社内URL・環境固有のパスなどが含まれます。共有する前に、認証情報・個人のファイル名・社内だけで通じる識別子がないか確認してください。PRには必要な部分だけを使います。</p>
+      </article>
+      <article>
+        <h2><code>/rename</code></h2><p class="maker">セッション</p>
+        <h3>できること</h3><ul><li>現在の会話に作業内容が分かる名前を付ける</li></ul>
+        <h3>使いどころ</h3><ul><li>複数の会話を並行して扱い、後から探しやすくしたいとき（例：「認証を直す」より「セッション期限の境界値テスト」）</li></ul>
+        <p class="note">参考記事によると、Codex CLI 0.150.0では会話に基づく名前の候補を編集して使えます。<code>/title</code>との違いなど、バージョンごとの仕様は公式ドキュメントで確認してください。</p>
       </article>
     </div>
 
@@ -847,12 +878,12 @@ sandbox_mode = &quot;danger-full-access&quot;</pre></li></ul>
     <div class="grid">
       <article>
         <h2>表示を整えるコマンド</h2><p class="maker">表示・UI</p>
-        <h3>コマンド</h3><ul><li><code>/statusline</code>：モデル・Effort・プロジェクト・Gitブランチなどを表示</li><li><code>/title</code>：セッションに名前を付ける</li><li><code>/theme</code>：コード表示などの見た目を変える</li><li><code>/keymap</code>：ショートカットキーの一覧</li><li><code>/raw</code>：プレーンテキスト寄りの表示に切り替える</li><li><code>/copy</code>：出力をクリップボードへコピー</li><li><code>/exit</code>：セッションを終了</li></ul>
+        <h3>コマンド</h3><ul><li><code>/statusline</code>：モデル・Effort・プロジェクト・Gitブランチなどを表示</li><li><code>/title</code>：セッションに名前を付ける</li><li><code>/theme</code>：コード表示などの見た目を変える</li><li><code>/keymap</code>：ショートカットキーの一覧</li><li><code>/raw</code>：プレーンテキスト寄りの表示に切り替える</li><li><code>/copy</code>：出力をクリップボードへコピー（詳細は<a href="#slash-commands--conversation">会話の要約・コピー・記録</a>）</li><li><code>/exit</code>：セッションを終了</li></ul>
         <p class="note">Codexが処理している最中でも、次の指示を入力しておけます。</p>
       </article>
     </div>
 
-    <aside class="guide" aria-labelledby="slash-commands--note"><h2 id="slash-commands--note">スラッシュコマンドの基本</h2><p>Codexのセッションで<code>/</code>を入力すると、使えるコマンドの候補が表示されます。すべてを暗記せず、「何をしたいか」から選べるようにしておくのがコツです。よく使う流れは、<code>/plan</code>で計画 → 実装 → <code>/diff</code>で変更確認 → <code>/review</code>でレビュー、長い作業では<code>/compact</code>、後日の再開は<code>/resume</code>です。</p></aside>
+    <aside class="guide" aria-labelledby="slash-commands--note"><h2 id="slash-commands--note">スラッシュコマンドの基本</h2><p>Codexのセッションで<code>/</code>を入力すると、使えるコマンドの候補が表示されます。すべてを暗記せず、「何をしたいか」から選べるようにしておくのがコツです。よく使う流れは、<code>/plan</code>で計画 → 実装 → <code>/diff</code>で変更確認 → <code>/review</code>でレビュー、長い作業では<code>/compact</code>、後日の再開は<code>/resume</code>です。会話を思い出すなら<code>/recap</code>、一部を使うなら<code>/copy</code>、経緯ごと残すなら<code>/export</code>と使い分け、今の状態は<code>/status</code>と<code>/diff</code>で確かめます。</p></aside>
 
     </section>
     </main>
